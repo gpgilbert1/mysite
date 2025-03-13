@@ -57,6 +57,8 @@ def get_metal_data(ticker):
 # Streamlit UI
 st.title("Metal Price Dashboard")
 
+st.image("logo.jpg", use_column_width=True)
+
 # Scrape real-time metal prices
 with st.spinner("Fetching live metal prices..."):
     metal_prices = get_metal_prices()
