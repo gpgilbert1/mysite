@@ -3,7 +3,8 @@ const puppeteer = require("puppeteer");
 const axios = require("axios");
 const path = require("path");
 const app = express();
-const PORT = 3000;
+
+const PORT = process.env.PORT || 3000; // Use dynamic Vercel port or fallback to 3000
 
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
@@ -14,7 +15,7 @@ async function getMetalPrices() {
     const browser = await puppeteer.launch({ headless: "new" });
     const page = await browser.newPage();
     await page.goto("https://www.metalsdaily.com/live-prices/pgms/");
-    
+
     const metalPrices = await page.evaluate(() => {
         const rows = document.querySelectorAll("table tr");
         let prices = {};
@@ -57,11 +58,13 @@ app.get("/", async (req, res) => {
     let metalPrices = await getMetalPrices();
     let goldData = await getMetalData("GC=F");
     let silverData = await getMetalData("SI=F");
-    
+
     metalPrices["Gold"] = metalPrices["Gold"] || goldData.prices.slice(-1)[0] / 28;
     metalPrices["Silver"] = metalPrices["Silver"] || silverData.prices.slice(-1)[0] / 28;
 
     res.render("index", { metalPrices, goldData, silverData });
 });
 
-app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
+// Export for Vercel serverless
+module.exports = app;
+
